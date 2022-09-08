@@ -81,77 +81,31 @@
         request.send(JSON.stringify(data));
     }
 
-    var PYGMENTS_TO_ACE_MAPPINGS = {
-        'c':  'ace_comment', // Comment,
-        'na': 'ace_support ace_function ace_directive', // Name.Attribute,
-        'no': 'ace_constant', // Name.Constant,
-        'nl': 'ace_entity ace_name ace_function', // Name.Label,
-        'nv': 'ace_variable ace_parameter ace_register', // Name.Variable,
-        'mh': 'ace_constant ace_character ace_hexadecimal', // Number.Hex,
-        'mi': 'ace_constant ace_character ace_decimal', // Number.Integer,
-        'p':  'ace_punctuation', // Punctuation,
-        's':  'ace_string', // String,
-        'sc': 'ace_string', // String.Char,
-        '':   '', // Text,
-    };
-
-    function rehighlight(pygmentized) {
-        var mappings = PYGMENTS_TO_ACE_MAPPINGS;
-        return pygmentized.replace(/<span class="([^"]*)">([^<]*)<\/span>/g, function() {
-            var classes = mappings[arguments[1]];
-            if (classes) {
-                return '<span class="' + classes + '">' + arguments[2] + '</span>';
-            } else {
-                return arguments[2];
-            }
-        });
-    }
-
-    function evaluate(result, code, version, optimize, button, test, backtrace) {
-        send("evaluate.json", {code: code, version: version, optimize: optimize, test: !!test, separate_output: true, color: true, backtrace: backtrace },
+    function evaluate(result, code, button) {
+        send("evaluate.json", {code: code},
             function(object) {
                 var samp, pre;
                 set_result(result);
-                if (object.rustc) {
-                    samp = document.createElement("samp");
-                    samp.innerHTML = formatCompilerOutput(object.rustc);
-                    pre = document.createElement("pre");
-                    pre.className = "rustc-output " + (("program" in object) ? "rustc-warnings" : "rustc-errors");
-                    pre.appendChild(samp);
-                    result.appendChild(pre);
-                }
-
-                var div = document.createElement("p");
-                div.className = "message";
-                if ("program" in object) {
-                    samp = document.createElement("samp");
-                    samp.className = "output";
-                    samp.innerHTML = formatCompilerOutput(object.program);
-                    pre = document.createElement("pre");
-                    pre.appendChild(samp);
-                    result.appendChild(pre);
-                    if (test) {
-                        div = null;
-                    } else {
-                        div.textContent = "Program ended.";
-                    }
-                } else {
-                    div.textContent = "Compilation failed.";
-                }
-                if (div) {
-                    result.appendChild(div);
-                }
-        }, button, test ? "Running tests…" : "Running…", result);
+                samp = document.createElement("samp");
+                samp.className = "output";
+                samp.innerHTML = object.result;
+                pre = document.createElement("pre");
+                pre.appendChild(samp);
+                result.appendChild(pre);
+        }, button, "Running…", result);
     }
 
     function compile(result, code, button) {
-        send("compile.json", {code: code}, function(object) {
-            if ("error" in object) {
-                set_result(result, "<pre class=\"rustc-output rustc-errors\"><samp></samp></pre>");
-                result.firstChild.firstChild.innerHTML = formatCompilerOutput(object.error);
-            } else {
-                set_result(result, "<pre class=highlight><code>" + rehighlight(object.result) + "</code></pre>");
-            }
+        send("compile.json", {code: code},
+            function(object) {
+                var samp, pre;
+                set_result(result);
+                samp = document.createElement("samp");
+                samp.className = "output";
+                samp.innerHTML = object.result;
+                pre = document.createElement("pre");
+                pre.appendChild(samp);
+                result.appendChild(pre);
         }, button, "Compiling…", result);
     }
 
@@ -247,79 +201,7 @@
             // this would be a waste of time
             updateEvaluateAction(code);
         }
-        evaluate(result, session.getValue(), getRadioValue("version"),
-                 getRadioValue("optimize"), evaluateButton,
-                 false, 0);
-    }
-
-    var COLOR_CODES = ['black', 'red', 'green', 'yellow', 'blue', 'magenta', 'cyan', 'white'];
-
-    // A simple function to decode ANSI escape codes into HTML.
-    // This is very basic, with lots of very obvious omissions and holes;
-    // it’s designed purely to cope with rustc output.
-    //
-    // TERM=xterm rustc uses these:
-    //
-    // - bug/fatal/error = red
-    // - warning = yellow
-    // - note = green
-    // - help = cyan
-    // - error code = magenta
-    // - bold
-    function ansi2html(text) {
-        return text.replace(/&/g, '&amp;')
-            .replace(/</g, '&lt;')
-            .replace(/>/g, '&gt;')
-            .replace(/\x1b\[1m\x1b\[3([0-7])m([^\x1b]*)(?:\x1b\(B)?\x1b\[0?m/g, function(original, colorCode, text) {
-                return '<span class=ansi-' + COLOR_CODES[+colorCode] + '><strong>' + text + '</strong></span>';
-            }).replace(/\x1b\[3([0-7])m([^\x1b]*)(?:\x1b\(B)?\x1b\[0?m/g, function(original, colorCode, text) {
-                return '<span class=ansi-' + COLOR_CODES[+colorCode] + '>' + text + '</span>';
-            }).replace(/\x1b\[1m([^\x1b]*)(?:\x1b\(B)?\x1b\[0?m/g, function(original, text) {
-                return "<strong>" + text + "</strong>";
-            }).replace(/(?:\x1b\(B)?\x1b\[0?m/g, '');
-    }
-
-    //This affects how mouse acts on the program output.
-    //Screenshots here: https://github.com/rust-lang/rust-playpen/pull/192#issue-145465630
-    //If mouse hovers on eg. "<anon>:3", temporarily show that line(3) into view by
-    //selecting it entirely and move editor's cursor to the beginning of it;
-    //Moves back to original view when mouse moved away.
-    //If mouse left click on eg. "<anon>:3" then the editor's cursor is moved
-    //to the beginning of that line
-    function jumpToLine(text, r1) {
-        return "<a onclick=\"javascript:editGo(" + r1 + ",1)\"" +
-            " onmouseover=\"javascript:editShowLine("+r1+")\"" +
-            " onmouseout=\"javascript:editRestore()\"" +
-            " class=\"linejump\">" + text + "</a>";
-    }
-
-    //Similarly to jumpToLine, except this one acts on eg. "<anon>:2:31: 2:32"
-    //and thus selects a region on mouse hover, or when clicked sets cursor to
-    //the beginning of region.
-    function jumpToRegion(text, r1,c1, r2,c2) {
-        return "<a onclick=\"javascript:editGo("+r1+","+c1+")\"" +
-            " onmouseover=\"javascript:editShowRegion("+r1+","+c1+", "+r2+","+c2+")\"" +
-            " onmouseout=\"javascript:editRestore()\"" +
-            " class=\"linejump\">" + text + "</a>";
-    }
-
-    //Similarly to jumpToLine, except this one acts on eg. "<anon>:2:31"
-    function jumpToPoint(text, r1,c1) {
-        return "<a onclick=\"javascript:editGo("+r1+","+c1+")\"" +
-            " onmouseover=\"javascript:editShowPoint("+r1+","+c1+")\"" +
-            " onmouseout=\"javascript:editRestore()\"" +
-            " class=\"linejump\">" + text + "</a>";
-    }
-
-    function formatCompilerOutput(text) {
-        return ansi2html(text).replace(/\[(--explain )?(E\d\d\d\d)\]/g, function(text, prefix, code) {
-            return "[<a href=https://doc.rust-lang.org/error-index.html#" + code + " target=_blank>" + (prefix ? prefix : "") + code + "</a>]";
-        }).replace(/run `rustc --explain (E\d\d\d\d)` to see a detailed explanation/g, function(text, code) {
-            return "see the <a href=https://doc.rust-lang.org/error-index.html#" + code + " target=_blank>detailed explanation for " + code + "</a>";
-        }).replace(/&lt;anon&gt;:(\d+)$/mg, jumpToLine) // panicked at 'foo', $&
-        .replace(/^&lt;anon&gt;:(\d+):(\d+):\s+(\d+):(\d+)/mg, jumpToRegion)
-        .replace(/^&lt;anon&gt;:(\d+)/mg, jumpToLine)
-        .replace(/&lt;anon&gt;:(\d+):(\d+)/mg, jumpToPoint);  // new errors
+        evaluate(result, session.getValue(), evaluateButton);
     }
 
     addEventListener("DOMContentLoaded", function() {

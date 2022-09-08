@@ -66,22 +66,22 @@ impl Cache {
 }
 
 /// Highlights compiled rustc output according to the given output format
-pub fn highlight(output: &str) -> String {
-    let lexer = "gas";
+// pub fn highlight(output: &str) -> String {
+//     let lexer = "gas";
 
-    let mut child = Command::new("pygmentize")
-                            .arg("-l")
-                            .arg(lexer)
-                            .arg("-f")
-                            .arg("html")
-                            .stdin(Stdio::piped())
-                            .stdout(Stdio::piped())
-                            .spawn().unwrap();
-    child.stdin.take().unwrap().write_all(output.as_bytes()).unwrap();
-    let output = child.wait_with_output().unwrap();
-    assert!(output.status.success());
-    String::from_utf8(output.stdout).unwrap()
-}
+//     let mut child = Command::new("pygmentize")
+//                             .arg("-l")
+//                             .arg(lexer)
+//                             .arg("-f")
+//                             .arg("html")
+//                             .stdin(Stdio::piped())
+//                             .stdout(Stdio::piped())
+//                             .spawn().unwrap();
+//     child.stdin.take().unwrap().write_all(output.as_bytes()).unwrap();
+//     let output = child.wait_with_output().unwrap();
+//     assert!(output.status.success());
+//     String::from_utf8(output.stdout).unwrap()
+// }
 
 // #[cfg(test)]
 // mod tests {
