@@ -2,27 +2,9 @@
 hosted at <https://play.rust-lang.org/>, check out the
 [next-gen playpen](https://github.com/integer32llc/rust-playground/).
 
-# Old README
+# L4T-Playpen
 
-A web interface for running Rust code.
-
-The interface can also be accessed in most Rust-related channels on
-`irc.mozilla.org`.
-
-To use Playbot in a public channel, address your message to it.
-
-    <you> playbot: println!("Hello, World");
-    -playbot:#rust-offtopic- Hello, World
-    -playbot:#rust-offtopic- ()
-    <you> playbot: 1+2+3
-    -playbot:#rust-offtopic- 6
-
-You can also private message Playbot your code to have it evaluated. In a
-private message, don't preface the code with playbot's nickname:
-
-    /msg playbot println!("Hello, World");
-
-# Running your own Rust-Playpen
+A web interface for running L4T code.
 
 ## System Requirements
 
@@ -43,11 +25,6 @@ cargo run --bin playpen
 ```
 
 You should now be able to browse http://127.0.0.1:8080 and interact.
-
-## IRC Bot Setup
-
-You'll need to move `playbot.toml.example` to `playbot.toml` and then configure
-it appropriately.
 
 # Setting up the play.rust-lang.org server
 
@@ -80,16 +57,8 @@ sudo service docker start
 sudo usermod -aG docker ubuntu
 ```
 
-Next, configure `playbot.toml` copied from `playbot.toml.example`.
-
-Next, open up a screen window (`screen -R`), and spin up two sessions:
-
 ```
 cargo build --release --bin playpen && RUST_LOG=debug ./target/release/playpen 0.0.0.0 2>&1 | logger -t playpen
-```
-
-```
-cargo build --release --bin playbot && RUST_LOG=debug ./target/release/playbot 2>&1 | logger -t playbot
 ```
 
 Add a cron job to update the containers daily, currently:
