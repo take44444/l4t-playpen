@@ -1,0 +1,50 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <title>L4T Playground</title>
+        <meta charset="utf-8"/>
+        <!-- Bear in mind with the figure 720 that when the stable channel is added the toolbar will be full, and so any additions beyond that will necessitate change here or there. -->
+        <meta name=viewport id=meta-viewport content="width=720">
+        <script>if (screen.width > 720) { document.getElementById("meta-viewport").setAttribute('content', 'width=device-width'); }</script>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Source+Code+Pro:400,700"/>
+        <!-- web.css and web.js need cache busting; increment the numbers when you make changes -->
+        <link rel="stylesheet" href="web.css?5">
+        <!-- <link rel="shortcut icon" href="https://doc.rust-lang.org/favicon.ico"/> -->
+        <script src="https://cdn.jsdelivr.net/ace/1.2.6/min/ace.js"
+                integrity="sha512-Y/M43OHLyvSuqF2JuQU9RIerW7fH7i/h/7AokQPIXhoYiHIxKXYDCWcuyRSXiVCGGtnfYoIBklTZ4/t26Lrr/A=="
+                crossorigin="anonymous"
+                charset="utf-8"></script>
+        <script src="https://cdn.jsdelivr.net/ace/1.2.6/min/ext-themelist.js"
+                integrity="sha512-ZdrBduTZxDAOqGKxKVuFtIVU0wD82q0HXnUEj8/KBHZ9DbQuuAjfMZ7yyBnh3vzkOtMQex9jj8EuypRD+KGNSA=="
+                crossorigin="anonymous"
+                charset="utf-8"></script>
+        <script src="web.js?13"></script>
+    </head>
+    <body>
+        <form id="control">
+            <div
+                ><button type=button class=primary id=evaluate title="Execute your code (you can also press Ctrl+Enter when editing code)">Run</button
+                ><button type=button class=primary id=asm title="Compile to ASM">ASM</button>
+            </div>
+            <div class=right-c-e>
+                <button type=button id=configure-editor><span>Configure editor</span></button>
+                <div class=dropdown>
+                    <p><label for=keyboard>Keyboard bindings:</label>
+                    <select name=keyboard id=keyboard>
+                        <option>Ace</option>
+                        <option>Emacs</option>
+                        <option>Vim</option>
+                    </select>
+                    <p><label for=themes>Theme:</label>
+                    <select name=themes id=themes></select>
+                </div>
+            </div>
+        </form>
+        <main>
+            <div id=editor>fn main() {
+    println!("Hello, world!");
+}</div>
+            <div id=result data-empty><div></div><button type=button id=clear-result title="Close this pane">×</button></div>
+        </main>
+    </body>
+</html>
