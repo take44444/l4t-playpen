@@ -5,10 +5,12 @@ hosted at <https://play.rust-lang.org/>, check out the
 # L4T-Playpen
 
 A web interface for running L4T code.
+See <https://github.com/take44444/l4tc> about L4T.
 
 ## System Requirements
 
 Currently needs to be run on a system with access to Docker.
+(cargo 1.63.0 (fd9c4297c 2022-07-01))
 
 ## Running the web server
 
