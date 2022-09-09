@@ -1,7 +1,3 @@
-***Note:*** This project is deprecated.  To report issues about the playground
-hosted at <https://play.rust-lang.org/>, check out the
-[next-gen playpen](https://github.com/integer32llc/rust-playground/).
-
 # L4T-Playpen
 
 A web interface for running L4T code.
