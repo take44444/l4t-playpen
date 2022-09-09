@@ -14,17 +14,17 @@ pub struct Container {
 
 impl Container {
     pub fn new(cmd: &str, name: &str) -> io::Result<Container> {
-        let out = try!(run(Command::new("docker")
-                                   .arg("create")
-                                   .arg("--cap-drop=ALL")
-                                   .arg("--memory=16m")
-                                   .arg("--net=none")
-                                   .arg("--pids-limit=5")
-                                   .arg("--security-opt=no-new-privileges")
-                                   .arg("--interactive")
-                                   .arg(name)
-                                   .arg(cmd)
-                                   .stderr(Stdio::inherit())));
+        let out = run(Command::new("docker")
+                              .arg("create")
+                              .arg("--cap-drop=ALL")
+                              .arg("--memory=16m")
+                              .arg("--net=none")
+                              .arg("--pids-limit=5")
+                              .arg("--security-opt=no-new-privileges")
+                              .arg("--interactive")
+                              .arg(name)
+                              .arg(cmd)
+                              .stderr(Stdio::inherit()))?;
         let stdout = String::from_utf8_lossy(&out.stdout);
         Ok(Container {
             id: stdout.trim().to_string(),
@@ -42,8 +42,8 @@ impl Container {
            .stderr(Stdio::piped());
         debug!("attaching with {:?}", cmd);
         let start = Instant::now();
-        let mut cmd = try!(cmd.spawn());
-        try!(cmd.stdin.take().unwrap().write_all(input));
+        let mut cmd = cmd.spawn()?;
+        cmd.stdin.take().unwrap().write_all(input)?;
         debug!("input written, now waiting");
 
         let mut stdout = cmd.stdout.take().unwrap();
@@ -54,7 +54,7 @@ impl Container {
         let sink2 = sink.clone();
         let stderr = thread::spawn(move || append(&sink2, &mut stderr));
 
-        let (status, timeout) = match try!(cmd.wait_timeout(timeout)) {
+        let (status, timeout) = match cmd.wait_timeout(timeout)? {
             Some(status) => {
                 debug!("finished before timeout");
                 // TODO: document this
@@ -62,8 +62,8 @@ impl Container {
             }
             None => {
                 debug!("timeout, going to kill");
-                try!(run(Command::new("docker").arg("kill").arg(&self.id)));
-                (try!(cmd.wait()), true)
+                run(Command::new("docker").arg("kill").arg(&self.id))?;
+                (cmd.wait()?, true)
             }
         };
         stdout.join().unwrap();
@@ -85,7 +85,7 @@ impl Container {
     }
 }
 
-fn append(into: &Mutex<Vec<u8>>, from: &mut Read) {
+fn append(into: &Mutex<Vec<u8>>, from: &mut dyn Read) {
     let mut buf = [0; 1024];
     while let Ok(amt) = from.read(&mut buf) {
         if amt == 0 {
@@ -107,7 +107,7 @@ impl Drop for Container {
 fn run(cmd: &mut Command) -> io::Result<Output> {
     debug!("spawning: {:?}", cmd);
     let start = Instant::now();
-    let out = try!(cmd.output());
+    let out = cmd.output()?;
     debug!("done in: {:?}", start.elapsed());
     debug!("output: {:?}", out);
     if !out.status.success() {

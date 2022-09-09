@@ -6,12 +6,8 @@ extern crate wait_timeout;
 
 use lru_cache::LruCache;
 
-use std::error::Error;
-use std::fmt;
-use std::io::Write;
 use std::io;
-use std::process::{Command, ExitStatus, Stdio};
-use std::str::FromStr;
+use std::process::ExitStatus;
 use std::sync::Mutex;
 use std::time::Duration;
 
@@ -50,9 +46,9 @@ impl Cache {
         drop(cache);
 
         let container = "l4t-playpen";
-        let container = try!(Container::new(cmd, &container));
+        let container = Container::new(cmd, &container)?;
 
-        let tuple = try!(container.run(key.input.as_bytes(), Duration::new(5, 0)));
+        let tuple = container.run(key.input.as_bytes(), Duration::new(5, 0))?;
         let (status, mut output, timeout) = tuple;
         if timeout {
             output.extend_from_slice(b"\ntimeout triggered!");
