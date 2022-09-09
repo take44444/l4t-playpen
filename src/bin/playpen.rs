@@ -163,7 +163,7 @@ fn main() {
     chain.link_after(EnablePostCors);
 
     let addr = env::args().skip(1).next().unwrap_or("127.0.0.1".to_string());
-    let addr = (&addr[..], 8080);
+    let addr = (&addr[..], 80);
     println!("listening on {:?}", addr);
     Iron::new(chain).http(addr).unwrap();
 }
