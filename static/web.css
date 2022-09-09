@@ -282,7 +282,7 @@ input[type=radio]:checked:active + label + input + label {
     border-left-width: 0;
 }
 
-#editor, pre {
+#editor, pre, samp {
     font-size: 11pt;
     font-family: Source Code Pro, monospace;
 }

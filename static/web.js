@@ -192,7 +192,6 @@
     var themelist;
     var theme;
     var mode;
-    // evaluateButton.textContent = "Run";
 
     function doEvaluate(skipActionGuessing) {
         var code = session.getValue();
@@ -202,6 +201,16 @@
             updateEvaluateAction(code);
         }
         evaluate(result, session.getValue(), evaluateButton);
+    }
+
+    function doCompile(skipActionGuessing) {
+        var code = session.getValue();
+        if (!skipActionGuessing) {
+            // If we have called this since the last change in the editor,
+            // this would be a waste of time
+            updateEvaluateAction(code);
+        }
+        compile(result, session.getValue(), asmButton);
     }
 
     addEventListener("DOMContentLoaded", function() {
@@ -276,6 +285,11 @@
             editor.focus();
         };
 
+        asmButton.onclick = function() {
+            doCompile(true);
+            editor.focus();
+        };
+
         editor.commands.addCommand({
             name: "evaluate",
             exec: evaluateButton.onclick,
@@ -324,11 +338,6 @@
         editor.commands.removeCommand("transposeletters");
         delete transposeletters.bindKey;
         editor.commands.addCommand(transposeletters);
-
-        asmButton.onclick = function() {
-            compile(result, session.getValue(), getRadioValue("version"),
-                     getRadioValue("optimize"), asmButton, 0);
-        };
 
         configureEditorButton.onclick = function() {
             var dropdown = configureEditorButton.nextElementSibling;
