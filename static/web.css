@@ -1,7 +1,5 @@
 :root {
-    background-color: #f0f0ea;
-    background-image: linear-gradient(#e0e0da, #f0f0ea 400px);
-    background-image: linear-gradient(#e0e0da, #f0f0ea 50vh);
+    background-color: #253142;
     background-repeat: no-repeat;
     color: #202020;
     height: 100%;
@@ -17,12 +15,18 @@
 }
 
 :root, button {
-    line-height: 1.4;
+    line-height: 1;
+    margin-right: 0.5em;
 }
 
 :root, button, label {
-    font-family: sans-serif;
+    font-family: cursive, system-ui, Georgia;
     font-size: 1rem;
+}
+
+.license {
+    color: #EEE;
+    font-style: italic;
 }
 
 .message {
@@ -97,11 +101,13 @@
 
 @media screen and (min-width: 1000px) {
     #control::before {
+        color:#FFF;
         content: "L4T Playground";
         font-size: 1.4em;
         display: inline-block;
         vertical-align: middle;
         margin-right: 0.5em;
+        line-height: 1;
     }
 }
 
@@ -153,7 +159,7 @@ button.primary {
     /* color: #fff;
     background-color: #a42; */
     border-width: 0;
-    font-size: 1.4em;
+    font-size: 1.2em;
     border-radius: 4px;
 }
 
@@ -191,7 +197,7 @@ button.primary {
 
 #configure-editor {
     border-width: 0;
-    font-size: 1.4em;
+    font-size: 1.1em;
     border-radius: 4px;
 }
 
@@ -294,6 +300,7 @@ input[type=radio]:checked:active + label + input + label {
 }
 
 #result {
+    font-family: system-ui, sans-serif;
     overflow: auto;
     border: 3px solid rgba(153, 153, 153, 0.5);
     border-top: 0;

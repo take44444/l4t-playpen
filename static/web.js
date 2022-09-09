@@ -170,16 +170,6 @@
         }
     }
 
-    function getRadioValue(name) {
-        var nodes = document.getElementsByName(name);
-        for (var i = 0; i < nodes.length; i++) {
-            var node = nodes[i];
-            if (node.checked) {
-                return node.value;
-            }
-        }
-    }
-
     var evaluateButton;
     var asmButton;
     var configureEditorButton;
@@ -192,26 +182,6 @@
     var themelist;
     var theme;
     var mode;
-
-    function doEvaluate(skipActionGuessing) {
-        var code = session.getValue();
-        if (!skipActionGuessing) {
-            // If we have called this since the last change in the editor,
-            // this would be a waste of time
-            updateEvaluateAction(code);
-        }
-        evaluate(result, session.getValue(), evaluateButton);
-    }
-
-    function doCompile(skipActionGuessing) {
-        var code = session.getValue();
-        if (!skipActionGuessing) {
-            // If we have called this since the last change in the editor,
-            // this would be a waste of time
-            updateEvaluateAction(code);
-        }
-        compile(result, session.getValue(), asmButton);
-    }
 
     addEventListener("DOMContentLoaded", function() {
         evaluateButton = document.getElementById("evaluate");
@@ -241,7 +211,7 @@
 
         theme = optionalLocalStorageGetItem("theme");
         if (theme === null) {
-            set_theme(editor, themelist, "GitHub");
+            set_theme(editor, themelist, "Monokai");
         } else {
             set_theme(editor, themelist, theme);
         }
@@ -281,13 +251,13 @@
         };
 
         evaluateButton.onclick = function() {
-            doEvaluate(true);
-            editor.focus();
+            evaluate(result, session.getValue(), evaluateButton);
+            // editor.focus();
         };
 
         asmButton.onclick = function() {
-            doCompile(true);
-            editor.focus();
+            compile(result, session.getValue(), asmButton);
+            // editor.focus();
         };
 
         editor.commands.addCommand({
