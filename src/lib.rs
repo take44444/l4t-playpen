@@ -65,7 +65,7 @@ impl Cache {
     }
 }
 
-/// Highlights compiled rustc output according to the given output format
+// Highlights compiled rustc output according to the given output format
 // pub fn highlight(output: &str) -> String {
 //     let lexer = "gas";
 
