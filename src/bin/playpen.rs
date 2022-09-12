@@ -149,7 +149,7 @@ fn main() {
     env_logger::init().unwrap();
 
     // Make sure pygmentize is installed before starting the server
-    Command::new("pygmentize").spawn().unwrap().kill().unwrap();
+    // Command::new("pygmentize").spawn().unwrap().kill().unwrap();
 
     let mut router = Router::new();
     router.get("/", index, "root");
